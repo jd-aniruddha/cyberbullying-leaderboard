@@ -10,9 +10,12 @@ jobs:
   grade:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write   # 🔥 THIS FIXES YOUR ERROR
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install dependencies
         run: pip install pandas scikit-learn
@@ -22,8 +25,8 @@ jobs:
 
       - name: Commit leaderboard
         run: |
-          git config --global user.name "bot"
-          git config --global user.email "bot@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
           git add leaderboard.json
           git commit -m "Update leaderboard" || echo "No changes"
           git push
