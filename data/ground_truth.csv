@@ -1,4 +1,4 @@
 id,label
-1,TOXIC
-2,SAFE
-3,TOXIC
+1,HIGH
+2,LOW
+3,HIGH
