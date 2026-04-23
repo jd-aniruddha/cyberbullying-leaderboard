@@ -1,4 +1,4 @@
 id,prediction
-1,TOXIC
-2,SAFE
-3,SAFE
+1,HIGH
+2,LOW
+3,LOW
