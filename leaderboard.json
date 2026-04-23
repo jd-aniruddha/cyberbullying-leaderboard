@@ -3,5 +3,10 @@
     "submission": "user1.csv",
     "accuracy": 0.8,
     "f1_score": 0.8
+  },
+  {
+    "submission": "user1.csv",
+    "accuracy": 0.8,
+    "f1_score": 0.8
   }
 ]
