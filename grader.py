@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score, f1_score
 # Load data
 gt = pd.read_csv("data/ground_truth.csv")
 
+# Get latest submission
 submission_files = os.listdir("submissions")
 latest = sorted(submission_files)[-1]
 
@@ -37,9 +38,13 @@ leaderboard.append({
     "f1_score": round(float(f1), 4)
 })
 
-# Sort by F1 (better metric)
-leaderboard = sorted(leaderboard, key=lambda x: x["f1_score"], reverse=True)
+# Sort safely (prevents crash if key missing)
+leaderboard = sorted(
+    leaderboard,
+    key=lambda x: x.get("f1_score", 0),
+    reverse=True
+)
 
-# Save
+# Save leaderboard ✅
 with open(leaderboard_file, "w") as f:
     json.dump(leaderboard, f, indent=2)
