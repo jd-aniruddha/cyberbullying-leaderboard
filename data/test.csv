@@ -1,4 +1,4 @@
-id,text
-1,I hate you
-2,You are amazing
-3,You are stupid
+id,age,bmi,glucose,blood_pressure
+1,45,28,140,85
+2,25,22,90,70
+3,60,31,180,95
