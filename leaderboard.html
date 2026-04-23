@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaderboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            width: 70%;
+            background: white;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🏥 Diabetes Risk Leaderboard</h1>
+
+    <table id="leaderboard">
+        <tr>
+            <th>Rank</th>
+            <th>Submission</th>
+            <th>Accuracy</th>
+            <th>F1 Score</th>
+        </tr>
+    </table>
+
+    <script>
+        fetch('leaderboard.json')
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById("leaderboard");
+
+                data.forEach((item, index) => {
+                    let row = table.insertRow();
+
+                    row.insertCell(0).innerText = index + 1;
+                    row.insertCell(1).innerText = item.submission;
+                    row.insertCell(2).innerText = item.accuracy;
+                    row.insertCell(3).innerText = item.f1_score;
+                });
+            });
+    </script>
+</body>
+</html>
