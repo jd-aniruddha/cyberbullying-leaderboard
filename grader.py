@@ -43,3 +43,8 @@ leaderboard = sorted(leaderboard, key=lambda x: x["f1_score"], reverse=True)
 # Save
 with open(leaderboard_file, "w") as f:
     json.dump(leaderboard, f, indent=2)
+on:
+  push:
+    paths:
+      - 'submissions/**'
+  workflow_dispatch:
