@@ -53,7 +53,6 @@ function predict() {
     let glucose = document.getElementById("glucose").value;
     let bp = document.getElementById("bp").value;
 
-    // ⚠️ Validation
     if (!age || !bmi || !glucose || !bp) {
         alert("Please fill all fields");
         return;
@@ -66,27 +65,26 @@ function predict() {
         blood_pressure: parseInt(bp)
     };
 
-    // 🔥 CONNECT TO BACKEND (IMPORTANT)
-    fetch("https://cyberbullying-leaderboard.onrender.com", {
+    fetch("https://cyberbullying-leaderboard.onrender.com/predict", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(result => {
 
         document.getElementById("result").innerHTML =
             `
-            Prediction: ${result.prediction} <br><br>
-            Model Accuracy: ${result.accuracy} <br>
-            F1 Score: ${result.f1_score}
+            🧠 Prediction: ${result.prediction} <br><br>
+            📊 Accuracy: ${result.accuracy} <br>
+            📈 F1 Score: ${result.f1_score}
             `;
     })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Backend not connected properly");
+    .catch(err => {
+        console.error(err);
+        alert("Error connecting to backend");
     });
 }
 </script>
