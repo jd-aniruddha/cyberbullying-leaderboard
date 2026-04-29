@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "submission": "BASELINE",
+    "accuracy": null,
+    "f1_score": 1.0,
+    "date": "-"
+  },
+  {
+    "submission": "submissions/user2.csv",
+    "accuracy": 60.0,
+    "f1_score": 0.5,
+    "date": "2026-04-29 07:37 UTC"
+  }
+]
