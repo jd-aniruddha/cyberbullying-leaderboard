@@ -20,7 +20,7 @@ jobs:
         run: pip install pandas scikit-learn
 
       - name: Run grader
-        run: python grader/grader.py
+        run: python grader.py
 
       - name: Commit leaderboard
         run: |
