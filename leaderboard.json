@@ -6,6 +6,12 @@
     "date": "-"
   },
   {
+    "submission": "submissions/buriking5253_user1.csv",
+    "accuracy": 80.0,
+    "f1_score": 0.8,
+    "date": "2026-04-29 07:57 UTC"
+  },
+  {
     "submission": "submissions/user2.csv",
     "accuracy": 60.0,
     "f1_score": 0.5,
