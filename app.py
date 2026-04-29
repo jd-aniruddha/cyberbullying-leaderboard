@@ -1,68 +1,54 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
+import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score
 
 app = Flask(__name__)
 CORS(app)
 
-# 🔹 Home route (for testing)
+test = pd.read_csv("data/test.csv")
+gt = pd.read_csv("data/ground_truth.csv")
+
+X = test[["age", "bmi", "glucose", "blood_pressure"]].values
+y = gt["label"].map({"LOW": 0, "HIGH": 1}).values
+
+model = LogisticRegression(solver="liblinear")
+model.fit(X, y)
+
+preds = model.predict(X)
+
+labels = np.where(preds == 1, "HIGH", "LOW")
+
+df = gt.copy()
+df["prediction"] = labels
+
+ACCURACY = float(accuracy_score(df["label"], df["prediction"]))
+F1 = float(f1_score(df["label"], df["prediction"], pos_label="HIGH"))
+
 @app.route("/")
 def home():
-    return "Backend is running ✅"
+    return "Backend is running"
 
-
-# 🔹 Prediction API
 @app.route("/predict", methods=["POST"])
 def predict_api():
-
-    # Get user input
     data = request.json
 
-    age = data["age"]
-    bmi = data["bmi"]
-    glucose = data["glucose"]
-    bp = data["blood_pressure"]
+    user_input = np.array([[ 
+        data["age"],
+        data["bmi"],
+        data["glucose"],
+        data["blood_pressure"]
+    ]])
 
-    # 🔹 Load dataset
-    test = pd.read_csv("data/test.csv")
-    gt = pd.read_csv("data/ground_truth.csv")
+    pred = model.predict(user_input)[0]
 
-    # 🔹 Prepare training data
-    X = test[["age", "bmi", "glucose", "blood_pressure"]]
-    y = gt["label"].map({"LOW": 0, "HIGH": 1})   # encode labels
-
-    # 🔹 Train model
-    model = LogisticRegression()
-    model.fit(X, y)
-
-    # 🔹 Predict on dataset
-    test["prediction"] = model.predict(X)
-    test["prediction"] = test["prediction"].map({0: "LOW", 1: "HIGH"})
-
-    # 🔹 Evaluate model
-    df = gt.merge(test[["id", "prediction"]], on="id")
-
-    accuracy = accuracy_score(df["label"], df["prediction"])
-    f1 = f1_score(df["label"], df["prediction"], pos_label="HIGH")
-
-    # 🔹 Predict for user input
-    user_df = pd.DataFrame(
-        [[age, bmi, glucose, bp]],
-        columns=["age", "bmi", "glucose", "blood_pressure"]
-    )
-
-    user_pred = model.predict(user_df)[0]
-    user_pred = "HIGH" if user_pred == 1 else "LOW"
-
-    # 🔹 Return result
     return jsonify({
-        "prediction": user_pred,
-        "accuracy": round(float(accuracy), 4),
-        "f1_score": round(float(f1), 4)
+        "prediction": "HIGH" if pred == 1 else "LOW",
+        "accuracy": round(ACCURACY, 4),
+        "f1_score": round(F1, 4)
     })
 
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(host="0.0.0.0", port=10000, threaded=True)
