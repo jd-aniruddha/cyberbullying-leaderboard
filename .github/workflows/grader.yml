@@ -28,4 +28,4 @@ jobs:
           git config --global user.email "bot@github.com"
           git add leaderboard.json
           git commit -m "Update leaderboard" || echo "No changes"
-          git push
+          git push origin HEAD:main
