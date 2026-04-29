@@ -41,7 +41,7 @@ def grade(submission_path):
     baseline_f1 = round(f1_score(gt["label"], baseline_pred, pos_label="HIGH"), 4)
 
     # 📌 Load leaderboard
-    lb_file = "leaderboard_data/leaderboard.json"
+    lb_file = "leaderboard.json"
     if os.path.exists(lb_file):
         with open(lb_file) as f:
             leaderboard = json.load(f)
