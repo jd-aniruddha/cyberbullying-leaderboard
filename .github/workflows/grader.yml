@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Checkout BASE repo (safe)
+      # ✅ Checkout base repo (safe)
       - name: Checkout base repo
         uses: actions/checkout@v5
 
-      # ✅ Checkout PR code into separate folder
+      # ✅ Checkout PR code separately
       - name: Checkout PR submission
         uses: actions/checkout@v5
         with:
@@ -31,19 +31,23 @@ jobs:
         run: |
           cp pr_repo/submissions/*.csv submissions/
 
+      # 📦 Install dependencies
       - name: Install dependencies
         run: pip install pandas scikit-learn
 
+      # ▶️ Run grader
       - name: Run grader
         run: python grader.py
 
+      # 💾 Commit leaderboard
       - name: Commit leaderboard
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "bot@github.com"
+          git checkout main
           git add leaderboard.json
           git commit -m "Update leaderboard" || echo "No changes"
-          git push origin HEAD:main
+          git push origin main
 
       # 💬 Comment result on PR
       - name: Comment on PR
@@ -53,15 +57,14 @@ jobs:
             const fs = require('fs');
             const data = JSON.parse(fs.readFileSync('leaderboard.json', 'utf8'));
 
-            // ✅ pick submission (NOT baseline)
+            // pick submission (not baseline)
             const latest = data.find(x => x.submission !== "BASELINE");
+
+            const message = `📊 Results\n\nAccuracy: ${latest.accuracy}%\nF1 Score: ${latest.f1_score}`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `📊 **Results**
-
-Accuracy: ${latest.accuracy}%
-F1 Score: ${latest.f1_score}`
+              body: message
             });
