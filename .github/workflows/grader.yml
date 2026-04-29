@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Checkout base repo (safe)
+      # ✅ Checkout base repo
       - name: Checkout base repo
         uses: actions/checkout@v5
 
-      # ✅ Checkout PR code separately
+      # ✅ Checkout PR code
       - name: Checkout PR submission
         uses: actions/checkout@v5
         with:
@@ -26,10 +26,14 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           path: pr_repo
 
-      # 🔄 Copy submission into main repo
+      # 🔄 Copy submission safely (rename with username)
       - name: Copy submission file
         run: |
-          cp pr_repo/submissions/*.csv submissions/
+          mkdir -p submissions
+          for f in pr_repo/submissions/*.csv; do
+            new_name="submissions/${{ github.event.pull_request.user.login }}_$(basename $f)"
+            cp "$f" "$new_name"
+          done
 
       # 📦 Install dependencies
       - name: Install dependencies
@@ -39,14 +43,14 @@ jobs:
       - name: Run grader
         run: python grader.py
 
-      # 💾 Commit leaderboard
-      - name: Commit leaderboard
+      # 💾 Commit leaderboard + submissions
+      - name: Commit leaderboard and submissions
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "bot@github.com"
           git checkout main
-          git add leaderboard.json
-          git commit -m "Update leaderboard" || echo "No changes"
+          git add leaderboard.json submissions/*.csv
+          git commit -m "Update leaderboard + save submission" || echo "No changes"
           git push origin main
 
       # 💬 Comment result on PR
@@ -57,7 +61,7 @@ jobs:
             const fs = require('fs');
             const data = JSON.parse(fs.readFileSync('leaderboard.json', 'utf8'));
 
-            // pick submission (not baseline)
+            // pick submission (ignore baseline)
             const latest = data.find(x => x.submission !== "BASELINE");
 
             const message = `📊 Results\n\nAccuracy: ${latest.accuracy}%\nF1 Score: ${latest.f1_score}`;
