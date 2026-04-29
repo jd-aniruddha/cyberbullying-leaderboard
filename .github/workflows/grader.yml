@@ -1,20 +1,35 @@
 name: Auto Grader
 
 on:
-  pull_request:
+  pull_request_target:
     paths:
       - 'submissions/**'
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   grade:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout repo
+      # ✅ Checkout BASE repo (safe)
+      - name: Checkout base repo
         uses: actions/checkout@v5
+
+      # ✅ Checkout PR code into separate folder
+      - name: Checkout PR submission
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: pr_repo
+
+      # 🔄 Copy submission into main repo
+      - name: Copy submission file
+        run: |
+          cp pr_repo/submissions/*.csv submissions/
 
       - name: Install dependencies
         run: pip install pandas scikit-learn
@@ -29,3 +44,19 @@ jobs:
           git add leaderboard.json
           git commit -m "Update leaderboard" || echo "No changes"
           git push origin HEAD:main
+
+      # 💬 Optional: comment result on PR
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('leaderboard.json', 'utf8'));
+            const latest = data[0];
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `📊 **Results**\n\nAccuracy: ${latest.accuracy}%\nF1 Score: ${latest.f1_score}`
+            });
