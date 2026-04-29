@@ -1,32 +1,31 @@
 name: Auto Grader
 
 on:
-  push:
+  pull_request:
     paths:
       - 'submissions/**'
-  workflow_dispatch:
 
 jobs:
   grade:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write   # 🔥 THIS FIXES YOUR ERROR
+      contents: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v5
 
       - name: Install dependencies
         run: pip install pandas scikit-learn
 
       - name: Run grader
-        run: python grader.py
+        run: python grader/grader.py
 
       - name: Commit leaderboard
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions@github.com"
-          git add leaderboard.json
+          git config --global user.email "bot@github.com"
+          git add leaderboard_data/leaderboard.json
           git commit -m "Update leaderboard" || echo "No changes"
           git push
