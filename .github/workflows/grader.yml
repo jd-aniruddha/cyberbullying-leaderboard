@@ -45,18 +45,23 @@ jobs:
           git commit -m "Update leaderboard" || echo "No changes"
           git push origin HEAD:main
 
-      # 💬 Optional: comment result on PR
+      # 💬 Comment result on PR
       - name: Comment on PR
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const data = JSON.parse(fs.readFileSync('leaderboard.json', 'utf8'));
-            const latest = data[0];
+
+            // ✅ pick submission (NOT baseline)
+            const latest = data.find(x => x.submission !== "BASELINE");
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `📊 **Results**\n\nAccuracy: ${latest.accuracy}%\nF1 Score: ${latest.f1_score}`
+              body: `📊 **Results**
+
+Accuracy: ${latest.accuracy}%
+F1 Score: ${latest.f1_score}`
             });
